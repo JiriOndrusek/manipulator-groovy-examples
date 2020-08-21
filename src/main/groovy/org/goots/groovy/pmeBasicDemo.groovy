@@ -36,7 +36,7 @@ if ((m = version =~/(\d+)\.(\d+)\..*/)) {
     def secondVersion = m.group(2)
 
     //version 7.x has tag of image 1:x
-    String fuseImage = 'fuse-java-openshift:' + (firstVersion as Integer - 6) + '.' + secondVersion
+    String fuseImage = 'fuse-java-openshift:' + (firstVersion - 6) + '.' + secondVersion
     String fuseImageRepository = 'registry.redhat.io/fuse' + firstVersion + '/' + fuseImage
 
     println("Use image or documentation according to version " + firstVersion + '.' + secondVersion)
