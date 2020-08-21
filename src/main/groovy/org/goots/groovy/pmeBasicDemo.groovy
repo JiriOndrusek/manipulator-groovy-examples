@@ -15,40 +15,43 @@
  */
 package org.goots.groovy
 
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import org.commonjava.maven.atlas.ident.ref.SimpleProjectRef
 import org.commonjava.maven.ext.core.groovy.BaseScript
 import org.commonjava.maven.ext.core.groovy.InvocationPoint
 import org.commonjava.maven.ext.core.groovy.InvocationStage
 import org.commonjava.maven.ext.core.groovy.PMEBaseScript
 
-@InvocationPoint(invocationPoint = InvocationStage.LAST)
+@InvocationPoint(invocationPoint = InvocationStage.FIRST)
 @PMEBaseScript BaseScript pme
 
+println "#### pmeAlterReadme START"
 
-println "#### BASESCRIPT:"
-println pme.getBaseDir()
-println pme.getBaseDir().getClass().getName()
-println pme.getGAV()
-println pme.getGAV().getClass().getName()
-println pme.getProjects()
-println pme.getProject().getClass().getName()
-println pme.getProjects()
-println pme.getProject().getClass().getName()
-println pme.getSession().getPom()
-println "#### BASESCRIPT END"
+String version = pme.getProject().getModel().getProperties().getProperty('fuse.bom.version')
 
-Properties properties = pme.getProject().getModel().getProperties()
-println ('properties: ' + properties)
-Enumeration<String> enums = (Enumeration<String>) properties.propertyNames();
-while (enums.hasMoreElements()) {
-    String key = enums.nextElement();
-    String value = properties.getProperty(key);
+if ((m = version =~/(\d+)\.(\d+)\..*/)) {
+    def firstVersion = m.group(1)
+    def secondVersion = m.group(2)
 
-    String quickstartName = key.replace(".version", "");
-    String oldVersion = value.replaceAll(".redhat-[0-9]+", "")
-    oldVersion = oldVersion.replaceAll("-temporary", "")
+    //version 7.x has tag of image 1:x
+    String fuseImage = 'fuse-java-openshift:' + (firstVersion as Integer - 6) + '.' + secondVersion
+    String fuseImageRepository = 'registry.redhat.io/fuse' + firstVersion + '/' + fuseImage
 
-    println ("For quickstart " + quickstartName + " replace " + oldVersion + " GIT_REF version with " + value)
+    println("Use image or documentation according to version " + firstVersion + '.' + secondVersion)
+
+    String fileName = "README.adoc"
+    new File(fileName + ".bak").withWriter { w ->
+        new File(fileName).eachLine { line ->
+            w << line.replaceAll('oc import-image .*', 'oc import image ' + fuseImage + '--from=' + fuseImageRepository + ' --confirm')
+                    .replaceAll('red_hat_fuse/\\d+.\\d+/html/fuse_on_openshift_guide', 'red_hat_fuse/' + firstVersion + '.' + secondVersion + '/html/fuse_on_openshift_guide') + System.getProperty("line.separator")
+        }
+    }
+    Files.copy(Paths.get(fileName + ".bak"), Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING)
+    new File(fileName + ".bak").delete()
 }
+
+println "#### pmeAlterReadme END"
 
 pme.inlineProperty (pme.getProject(), SimpleProjectRef.parse("org.apache.maven:maven-core"))
