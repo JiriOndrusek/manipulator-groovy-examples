@@ -38,8 +38,8 @@ if ((m = version =~/(\d+)\.(\d+)\..*/)) {
     //version 7.x has tag of image 1:x
     String fuseImage = 'fuse-java-openshift:' + (firstVersion - 6) + '.' + secondVersion
     String fuseImageRepository = 'registry.redhat.io/fuse' + firstVersion + '/' + fuseImage
-
-    println("Use image or documentation according to version " + firstVersion + '.' + secondVersion)
+    String name = pme.getProject().getModel().getName();
+    println("For quickstart " + name + " replace version for import-image or documentation to version " + firstVersion + '.' + secondVersion)
 
     String fileName = "README.adoc"
     new File(fileName + ".bak").withWriter { w ->
