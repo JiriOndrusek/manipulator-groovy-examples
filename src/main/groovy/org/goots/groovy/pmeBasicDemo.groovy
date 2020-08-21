@@ -38,6 +38,7 @@ println pme.getSession().getPom()
 println "#### BASESCRIPT END"
 
 Properties properties = pme.getProject().getModel().getProperties()
+println ('properties: ' + properties)
 Enumeration<String> enums = (Enumeration<String>) properties.propertyNames();
 while (enums.hasMoreElements()) {
     String key = enums.nextElement();
