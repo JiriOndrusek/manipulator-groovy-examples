@@ -39,7 +39,7 @@ if ((m = version =~/(\d+)\.(\d+)\..*/)) {
     String fuseImage = 'fuse-java-openshift:' + (firstVersion - 6) + '.' + secondVersion
     String fuseImageRepository = 'registry.redhat.io/fuse' + firstVersion + '/' + fuseImage
     String name = pme.getProject().getModel().getName();
-    println("For quickstart " + name + " replace version for import-image or documentation to version " + firstVersion + '.' + secondVersion)
+    println("For quickstart '" + name + "' replace version for import-image or documentation to version " + firstVersion + '.' + secondVersion)
 
     String fileName = "README.adoc"
     new File(fileName + ".bak").withWriter { w ->
