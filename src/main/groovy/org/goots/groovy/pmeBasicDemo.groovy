@@ -37,5 +37,17 @@ println pme.getProject().getClass().getName()
 println pme.getSession().getPom()
 println "#### BASESCRIPT END"
 
+Properties properties = pme.getProject().getModel().getProperties()
+Enumeration<String> enums = (Enumeration<String>) properties.propertyNames();
+while (enums.hasMoreElements()) {
+    String key = enums.nextElement();
+    String value = properties.getProperty(key);
+
+    String quickstartName = key.replace(".version", "");
+    String oldVersion = value.replaceAll(".redhat-[0-9]+", "")
+    oldVersion = oldVersion.replaceAll("-temporary", "")
+
+    println ("For quickstart " + quickstartName + " replace " + oldVersion + " GIT_REF version with " + value)
+}
 
 pme.inlineProperty (pme.getProject(), SimpleProjectRef.parse("org.apache.maven:maven-core"))
